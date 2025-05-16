@@ -1,18 +1,33 @@
 // src/components/Services/servicesData.js
-export const servicesData = [
-  {
-    category: "Waxing",
-    image: "combo-image.jpeg", // Add image to public/images
-    subcategories: [
-      { name: "Underarm Wax", prices: [49, 199, 299] },
-      { name: "Full Arm Wax", prices: [99, 249] },
-    ]
-  },
-  {
-    category: "Facials",
-    image: "combo-image.jpeg",
-    subcategories: [
-      { name: "Gold Facial", prices: [499] },
-    ]
+import api from '../../api/api';
+
+export const fetchServicesData = async () => {
+  try {
+    console.log('Making API request to /categories');
+    const response = await api.get('/categories');
+    console.log('API Response:', response.data);
+    
+    if (!response.data || !Array.isArray(response.data)) {
+      console.error('Invalid response format:', response.data);
+      return [];
+    }
+
+    const categories = response.data;
+    console.log('Processing categories:', categories);
+
+    return categories.map(category => ({
+      category: category.name,
+      image: "combo-image.jpeg", // Keeping the existing image
+      subcategories: category.services.map(service => ({
+        name: service.name,
+        prices: [service.prices.Normal].filter(price => price !== undefined)
+      }))
+    }));
+  } catch (error) {
+    console.error('Error fetching services data:', error.response || error);
+    throw error; // Re-throw to handle in the component
   }
-];
+};
+
+// Export a default empty array that will be populated when data is fetched
+export const servicesData = [];

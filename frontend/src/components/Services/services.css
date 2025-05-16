@@ -5,10 +5,15 @@
   padding: 20px;
 }
 
+.accordion-container {
+  margin-top: 20px;
+}
+
 .accordion-item {
   margin-bottom: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
+  overflow: hidden;
 }
 
 .accordion-header {
@@ -18,6 +23,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 0.2s;
+}
+
+.accordion-header:hover {
+  background: #e9ecef;
 }
 
 .category-header {
@@ -26,6 +36,7 @@
   align-items: center;
   padding: 20px;
   background: #fff;
+  border-bottom: 1px solid #eee;
 }
 
 .category-image {
@@ -33,6 +44,7 @@
   height: 100px;
   object-fit: cover;
   border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .service-item {
@@ -41,6 +53,22 @@
   align-items: center;
   padding: 12px 20px;
   border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.service-item:hover {
+  background-color: #f8f9fa;
+}
+
+.service-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.price-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .price-btn {
@@ -48,19 +76,49 @@
   border: 1px solid #28a745;
   color: #28a745;
   padding: 8px 15px;
-  margin-left: 10px;
   border-radius: 20px;
   display: inline-flex;
   align-items: center;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .price-btn:hover {
   background: #28a745;
   color: white;
+  transform: translateY(-1px);
 }
 
 .add-icon {
   margin-left: 8px;
   font-weight: bold;
+}
+
+.no-services {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.no-price {
+  color: #666;
+  font-style: italic;
+}
+
+/* Loading and error states */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #dc3545;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #dc3545;
+  margin: 20px 0;
 }

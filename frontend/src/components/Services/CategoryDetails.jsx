@@ -7,15 +7,26 @@ const CategoryDetails = ({ category }) => (
     <div className="category-header">
       <h2>{category.category}</h2>
       <img 
-        src={category.image} 
+        src={`/images/${category.image}`} 
         alt={category.category} 
-        className="category-image" 
+        className="category-image"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = '/images/default-category.jpg';
+        }}
       />
     </div>
     <div className="services-list">
-      {category.subcategories.map((service, index) => (
-        <ServiceItem key={index} service={service} />
-      ))}
+      {category.subcategories.length === 0 ? (
+        <div className="no-services">No services available in this category</div>
+      ) : (
+        category.subcategories.map((service, index) => (
+          <ServiceItem 
+            key={`${category.category}-${service.name}-${index}`} 
+            service={service} 
+          />
+        ))
+      )}
     </div>
   </div>
 );
