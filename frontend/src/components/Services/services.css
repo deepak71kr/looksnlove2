@@ -1,0 +1,66 @@
+/* src/components/Services/services.css */
+.services-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.accordion-item {
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.accordion-header {
+  padding: 15px;
+  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #fff;
+}
+
+.category-image {
+  width: 150px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.service-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.price-btn {
+  background: #fff;
+  border: 1px solid #28a745;
+  color: #28a745;
+  padding: 8px 15px;
+  margin-left: 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.price-btn:hover {
+  background: #28a745;
+  color: white;
+}
+
+.add-icon {
+  margin-left: 8px;
+  font-weight: bold;
+}

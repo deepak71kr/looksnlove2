@@ -1,9 +1,14 @@
-import React from 'react'
+// src/pages/ServicesPage.jsx
+import React from 'react';
+import CategoryAccordion from '../components/Services/CategoryAccordion';
+import { servicesData } from '../components/Services/servicesData';
+import '../components/Services/services.css';
 
-const Services = () => {
-  return (
-    <div>Services</div>
-  )
-}
+const ServicesPage = () => (
+  <div className="services-page">
+    <h1>Our Services</h1>
+    <CategoryAccordion categories={servicesData} />
+  </div>
+);
 
-export default Services
+export default ServicesPage;
