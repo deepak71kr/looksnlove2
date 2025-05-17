@@ -1,8 +1,33 @@
+import { useState } from "react";
+import axios from "axios";
 import { FaWhatsapp, FaFacebook, FaInstagram } from "react-icons/fa";
 
 const Footer = () => {
+  // State for form fields and feedback
+  const [form, setForm] = useState({ name: "", phone: "", message: "" });
+  const [status, setStatus] = useState(null);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus(null);
+    try {
+      await axios.post("http://localhost:5000/api/contact", form); // Update URL if needed
+      setStatus("success");
+      setForm({ name: "", phone: "", message: "" });
+    } catch (err) {
+      setStatus("error");
+    }
+  };
+
   return (
-    <footer id='foot'
+    <footer
+      id="foot"
       className="relative bg-customPink bg-cover bg-center text-white py-10 px-5"
       style={{ backgroundImage: "url('/beauty-banner.png')" }}
     >
@@ -37,32 +62,49 @@ const Footer = () => {
           </a>
         </div>
 
-        <form className="space-y-4 max-w-md ml-auto">
+        <form className="space-y-4 max-w-md ml-auto" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="name"
             placeholder="Your Name"
+            value={form.name}
+            onChange={handleChange}
+            required
             className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500"
           />
           <input
             type="tel"
+            name="phone"
             placeholder="Phone Number"
+            value={form.phone}
+            onChange={handleChange}
+            required
             className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500"
           />
           <textarea
+            name="message"
             placeholder="Message"
+            value={form.message}
+            onChange={handleChange}
+            required
             className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500 h-24"
           ></textarea>
-          <button className="mt-6 w-full py-3 bg-pink-500 hover:bg-pink-600 text-white text-lg font-semibold rounded-full shadow-lg transition duration-300">
+          <button
+            type="submit"
+            className="mt-6 w-full py-3 bg-pink-500 hover:bg-pink-600 text-white text-lg font-semibold rounded-full shadow-lg transition duration-300"
+          >
             Book an Appointment
           </button>
+          {status === "success" && (
+            <p className="text-green-600 text-right">Message sent successfully!</p>
+          )}
+          {status === "error" && (
+            <p className="text-red-600 text-right">Failed to send message. Please try again.</p>
+          )}
         </form>
 
         <div className="mt-6">
-          <img
-            src="/logo.jpeg"
-            alt="Website Logo"
-            className="ml-auto h-16"
-          />
+          <img src="/logo.jpeg" alt="Website Logo" className="ml-auto h-16" />
         </div>
 
         <p className="mt-4 text-gray-400">&copy; LooksnLove 2025</p>
