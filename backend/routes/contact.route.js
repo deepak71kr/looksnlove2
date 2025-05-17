@@ -3,25 +3,29 @@ import Contact from '../models/contact.model.js';
 
 const router = express.Router();
 
-// POST: Save contact form data
 router.post('/', async (req, res) => {
   try {
-    const { name, phone, message } = req.body;
-    const contact = new Contact({ name, phone, message });
+    const { name, phone, message, date, time } = req.body;
+    // Log for debugging
+    console.log("Received body:", req.body);
+
+    if (!name || !phone || !message || !date || !time) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    const contact = new Contact({
+      name,
+      phone,
+      message,
+      date,
+      time,
+    });
+
     await contact.save();
     res.status(201).json({ message: 'Contact saved' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to save contact' });
-  }
-});
-
-// GET: Fetch all contacts (for admin)
-router.get('/', async (req, res) => {
-  try {
-    const contacts = await Contact.find().sort({ createdAt: -1 });
-    res.json(contacts);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch contacts' });
   }
 });
 

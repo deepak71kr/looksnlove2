@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./Signup.module.css"; // <-- Import the CSS module
 
@@ -12,6 +12,7 @@ const Signup = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,16 +25,36 @@ const Signup = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/user/signup", formData);
-      if (response.data.message === "Signup successful!") {
-        alert("Signup successful!");
-        setFormData({ name: "", email: "", password: "", phone: "" });
+      console.log("Attempting to connect to backend...");
+      const response = await axios.post("http://localhost:5000/api/user/signup", formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 5000 // 5 second timeout
+      });
+      
+      if (response.data.success) {
+        alert("Account created successfully! Please login to continue.");
+        navigate("/login");
       }
     } catch (err) {
-      if (err.response) {
+      console.error("Signup error:", err);
+      
+      if (err.code === 'ECONNREFUSED') {
+        setError("Cannot connect to server. Please make sure the backend server is running.");
+      } else if (err.code === 'ERR_NETWORK') {
+        setError("Network error. Please check if the backend server is running at http://localhost:5000");
+      } else if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
         setError(err.response.data.error || "Signup failed. Please try again.");
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please check if the backend server is running.");
       } else {
-        setError("Network error. Please check your connection.");
+        // Something happened in setting up the request that triggered an Error
+        setError("An unexpected error occurred. Please try again.");
       }
     } finally {
       setLoading(false);

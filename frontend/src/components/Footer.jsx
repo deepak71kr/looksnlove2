@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaWhatsapp, FaFacebook, FaInstagram } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useAuth } from "../context/AuthContext";
 
 // Helper to get today's date as a JS Date object
 function getTodayDateObj() {
@@ -19,7 +20,7 @@ function getUpcomingTimeSlot() {
   if (hour < 10) return "10am - 12pm";
   if (hour < 12) return "12pm - 2pm";
   if (hour < 14) return "2pm - 4pm";
-  if (hour < 16) return "4pm - 6pm";
+  if (hour < 16) return "4pm - 7pm";
   if (hour < 18) return "6pm - 8pm";
   if (hour < 20) return "8pm - 10pm";
   // If it's 10pm or later, default to first slot tomorrow
@@ -37,6 +38,7 @@ const timeSlots = [
 ];
 
 const Footer = () => {
+  const { user, isAuthenticated } = useAuth();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -45,6 +47,17 @@ const Footer = () => {
   const [deliveryDate, setDeliveryDate] = useState(getTodayDateObj());
   const [deliveryTime, setDeliveryTime] = useState(getUpcomingTimeSlot());
   const [status, setStatus] = useState(null);
+
+  // Auto-fill form when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setForm(prevForm => ({
+        ...prevForm,
+        name: user.name || "",
+        phone: user.phone || ""
+      }));
+    }
+  }, [isAuthenticated, user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -132,22 +145,24 @@ const Footer = () => {
           <input
             type="text"
             name="name"
-            placeholder="Your Name"
+            placeholder={isAuthenticated ? "Your Name" : "Name"}
             value={form.name}
             onChange={handleChange}
             required
-            className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500"
+            className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500 disabled:bg-white disabled:text-gray-600 border-none"
+            disabled={isAuthenticated}
           />
 
           {/* Phone */}
           <input
             type="tel"
             name="phone"
-            placeholder="Phone Number"
+            placeholder={isAuthenticated ? "Your Phone Number" : "Phone Number"}
             value={form.phone}
             onChange={handleChange}
             required
-            className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500"
+            className="input input-bordered w-full bg-white text-black focus:ring-2 focus:ring-pink-500 disabled:bg-white disabled:text-gray-600 border-none"
+            disabled={isAuthenticated}
           />
 
           {/* Date & Time in a single row, same height */}
@@ -159,13 +174,13 @@ const Footer = () => {
                 onChange={(date) => setDeliveryDate(date)}
                 minDate={getTodayDateObj()}
                 dateFormat="dd/MM/yyyy"
-                className="input input-bordered w-full bg-white text-black text-sm md:text-base focus:ring-2 focus:ring-pink-500 h-12"
+                className="input input-bordered w-full bg-white text-black text-sm md:text-base focus:ring-2 focus:ring-pink-500 h-12 "
                 calendarClassName="text-black"
                 popperPlacement="bottom"
                 placeholderText="Select Delivery Date"
                 style={{
                   borderRight: "none",
-                  color: deliveryDate ? "#111827" : "#9ca3af", // Tailwind gray-400
+                  color: deliveryDate ? "#111827" : "#9ca3af",
                 }}
               />
             </div>
@@ -175,11 +190,9 @@ const Footer = () => {
                 value={deliveryTime}
                 onChange={(e) => setDeliveryTime(e.target.value)}
                 required
-                className={`rounded-b-lg sm:rounded-b-none sm:rounded-r-lg border border-gray-300 p-2 w-full bg-white text-sm md:text-base focus:ring-2 focus:ring-pink-500 h-12 ${
-                  deliveryTime ? "text-black" : "text-gray-400"
-                }`}
+                className="rounded-b-lg sm:rounded-b-none sm:rounded-r-lg border border-gray-300 p-2 w-full bg-white text-sm md:text-base focus:ring-2 focus:ring-pink-500 h-12"
                 style={{
-                  color: deliveryTime ? "#111827" : "#9ca3af", // Tailwind gray-400
+                  color: deliveryTime ? "#111827" : "#9ca3af",
                 }}
               >
                 {!deliveryTime && (

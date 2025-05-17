@@ -11,26 +11,35 @@ import Orders from "./components/Orders";
 import Signup from "./auth/Signup";
 import Login from "./auth/Login";
 import AdminDashboard from "./admin/AdminDashboard";
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+
 const App = () => {
   return (
-    <Router>
-      <div>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/AboutUs" element={<AboutUs />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+    <AuthProvider>
+      <Router>
+        <div>
+          <Navbar />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/AboutUs" element={<AboutUs />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+            </Route>
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 
