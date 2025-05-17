@@ -7,34 +7,54 @@ import {
   LogOutIcon,
   UserCircleIcon,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
-  const cartItemCount = 8;
-  const cartTotal = 999;
+  const { isAuthenticated, logout } = useAuth();
+  const { cartItems, cartTotal } = useCart();
+  const navigate = useNavigate();
+
+  const serviceCategories = [
+    { name: "Combo Services", path: "/services/combo" },
+    { name: "Basic Services", path: "/services/basic" },
+    { name: "Regular Services", path: "/services/regular" },
+    { name: "Premium Services", path: "/services/premium" }
+  ];
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
-    <nav className="bg-customPink shadow-sm w-full">
+    <nav className="bg-customPink shadow-sm w-full sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <Link to="/" className="flex-shrink-0">
             <img
               src="/logo.jpeg"
               alt="Salon Logo"
-              className="w-20 h-40 object-contain"
+              className="h-16 w-auto object-contain"
             />
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8 font-semibold">
-            <a
-              href="/"
+            <Link
+              to="/"
               className="text-gray-700 hover:text-gray-900 transition-colors"
             >
               Home
-            </a>
+            </Link>
             {/* Services Dropdown */}
             <div className="relative group">
               <button className="flex items-center text-gray-700 hover:text-gray-900 transition-colors">
@@ -43,18 +63,15 @@ const Navbar = () => {
               </button>
               <div className="absolute z-50 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="py-1">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Submenu 1
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Submenu 2
-                  </a>
+                  {serviceCategories.map((service, index) => (
+                    <Link
+                      key={index}
+                      to={service.path}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      {service.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
@@ -64,61 +81,89 @@ const Navbar = () => {
             >
               Contact
             </a>
-            <a
-              href="/AboutUs"
+            <Link
+              to="/AboutUs"
               className="text-gray-700 hover:text-gray-900 transition-colors"
             >
               About Us
-            </a>
+            </Link>
           </div>
+
           {/* Right Side Icons */}
           <div className="flex items-center space-x-4">
             {/* Cart Dropdown */}
-            <div className="relative group">
-              <button className="p-2 hover:bg-red-200 rounded-full transition-colors relative">
+            {isAuthenticated ? (
+              <div className="relative group">
+                <Link to="/cart" className="p-2 hover:bg-red-200 rounded-full transition-colors relative inline-flex items-center">
+                  <ShoppingCartIcon size={20} />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
+                <div className="absolute z-50 right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="p-4">
+                    {cartItems.length > 0 ? (
+                      <>
+                        <div className="text-sm font-medium text-gray-900">
+                          {cartItems.length} Items
+                        </div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Subtotal: ${cartTotal}
+                        </div>
+                        <Link to="/cart">
+                          <button className="mt-3 w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">
+                            View Cart
+                          </button>
+                        </Link>
+                      </>
+                    ) : (
+                      <div className="text-sm text-gray-500">Your cart is empty</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="p-2 text-gray-700 hover:text-gray-900 transition-colors inline-flex items-center"
+              >
                 <ShoppingCartIcon size={20} />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              </button>
-              <div className="absolute z-50 right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="p-4">
-                  <div className="text-sm font-medium text-gray-900">
-                    {cartItemCount} Items
-                  </div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    Subtotal: ${cartTotal}
-                  </div>
-                  <a href="/cart">
-                    <button className="mt-3 w-full bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors">
-                      View Cart
-                    </button>
-                  </a>
-                </div>
-              </div>
-            </div>
+              </Link>
+            )}
+
             {/* User Dropdown */}
-            <div className="relative group">
-              <button className="p-2 hover:bg-red-200 rounded-full transition-colors">
-                <UserIcon size={20} />
-              </button>
-              <div className="absolute z-50 right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-1">
-                  <a
-                    href="/profile"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <UserCircleIcon size={16} className="mr-2" /> Profile
-                  </a>
-                  <a
-                    href="/logout"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <LogOutIcon size={16} className="mr-2" /> Logout
-                  </a>
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button className="p-2 hover:bg-red-200 rounded-full transition-colors">
+                  <UserIcon size={20} />
+                </button>
+                <div className="absolute z-50 right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="py-1">
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <UserCircleIcon size={16} className="mr-2" /> Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <LogOutIcon size={16} className="mr-2" /> Logout
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <Link
+                to="/login"
+                className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                Login
+              </Link>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -129,18 +174,19 @@ const Navbar = () => {
             </button>
           </div>
         </div>
+
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden py-4">
+          <div className="lg:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 font-semibold">
-              <a
-                href="/"
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+              <Link
+                to="/"
+                className="text-gray-700 hover:text-gray-900 transition-colors px-4"
               >
                 Home
-              </a>
+              </Link>
               {/* Mobile Services Dropdown */}
-              <div>
+              <div className="px-4">
                 <button
                   className="flex items-center text-gray-700 hover:text-gray-900 transition-colors"
                   onClick={() => setIsServicesOpen(!isServicesOpen)}
@@ -150,33 +196,38 @@ const Navbar = () => {
                 </button>
                 {isServicesOpen && (
                   <div className="ml-4 mt-2 space-y-2">
-                    <a
-                      href="#"
-                      className="block text-gray-700 hover:text-gray-900 transition-colors"
-                    >
-                      Submenu 1
-                    </a>
-                    <a
-                      href="#"
-                      className="block text-gray-700 hover:text-gray-900 transition-colors"
-                    >
-                      Submenu 2
-                    </a>
+                    {serviceCategories.map((service, index) => (
+                      <Link
+                        key={index}
+                        to={service.path}
+                        className="block text-gray-700 hover:text-gray-900 transition-colors"
+                      >
+                        {service.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
               <a
-                href="/contact"
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+                href="#foot"
+                className="text-gray-700 hover:text-gray-900 transition-colors px-4"
               >
-                Contact Us
+                Contact
               </a>
-              <a
-                href='/about'
-                className="text-gray-700 hover:text-gray-900 transition-colors"
+              <Link
+                to="/AboutUs"
+                className="text-gray-700 hover:text-gray-900 transition-colors px-4"
               >
                 About Us
-              </a>
+              </Link>
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  className="text-gray-700 hover:text-gray-900 transition-colors px-4"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}
