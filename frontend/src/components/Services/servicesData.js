@@ -1,6 +1,20 @@
 // src/components/Services/servicesData.js
 import api from '../../api/api';
 
+// Image mapping for existing categories
+const categoryImages = {
+  'Waxing': 'combo-image.jpeg',
+  'Facials': 'facial-category.jpg',
+  'Haircut': 'haircut-category.jpg',
+  'Manicure': 'manicure-category.jpg',
+  'Pedicure': 'pedicure-category.jpg',
+  'Massage': 'massage-category.jpg',
+  'Hair Color': 'hair-color-category.jpg',
+  'Hair Treatment': 'hair-treatment-category.jpg',
+  'Makeup': 'makeup-category.jpg',
+  'Threading': 'threading-category.jpg'
+};
+
 export const fetchServicesData = async () => {
   try {
     console.log('Making API request to /categories');
@@ -17,7 +31,7 @@ export const fetchServicesData = async () => {
 
     return categories.map(category => ({
       category: category.name,
-      image: "combo-image.jpeg", // Keeping the existing image
+      image: categoryImages[category.name] || 'combo-image.jpeg', // Use combo-image.jpeg for new categories
       subcategories: category.services.map(service => ({
         name: service.name,
         prices: [service.prices.Normal].filter(price => price !== undefined)

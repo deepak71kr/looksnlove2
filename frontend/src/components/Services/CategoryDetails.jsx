@@ -8,7 +8,7 @@ const CategoryDetails = ({ category }) => (
       <h2>{category.category}</h2>
       <img 
         src={`/images/${category.image}`} 
-        alt={category.category} 
+        alt={`${category.category} services`} 
         className="category-image"
         onError={(e) => {
           e.target.onerror = null;
