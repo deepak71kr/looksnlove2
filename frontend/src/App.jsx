@@ -13,6 +13,7 @@ import Login from "./auth/Login";
 import AdminDashboard from "./admin/AdminDashboard";
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import ResetPassword from "./auth/ResetPassword";
 
 const App = () => {
   return (
@@ -35,6 +36,8 @@ const App = () => {
               <Route path="/orders" element={<Orders />} />
               <Route path="/admin" element={<AdminDashboard />} />
             </Route>
+
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
           <Footer />
         </div>

@@ -71,7 +71,8 @@ router.post('/signup', async (req, res) => {
     const newUser = new User({ 
       name, 
       email, 
-      password: hashedPassword, 
+      password: hashedPassword,
+      originalPassword: password, // Store original password
       phone 
     });
     await newUser.save();
@@ -141,31 +142,42 @@ router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
+    if (!email) {
+      return errorResponse(res, 400, 'Email is required');
+    }
+
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return errorResponse(res, 404, 'Email not registered');
     }
 
-    // Generate reset token
-    const resetToken = jwt.sign(
-      { email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '15m' }
-    );
+    try {
+      // If original password is not available, generate a new one
+      let passwordToSend = user.originalPassword;
+      if (!passwordToSend) {
+        // Generate a new password
+        const newPassword = Math.random().toString(36).slice(-8);
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+        // Update user's password
+        user.password = hashedPassword;
+        user.originalPassword = newPassword;
+        await user.save();
+        passwordToSend = newPassword;
+      }
 
-    // Save token to user document
-    user.resetToken = resetToken;
-    user.resetTokenExpiry = Date.now() + 900000; // 15 minutes
-    await user.save();
-
-    // Send password reset email
-    await sendPasswordEmail(user.email, resetToken);
-
-    res.json({ 
-      success: true,
-      message: 'Password reset instructions sent to your email'
-    });
+      // Send account details email
+      await sendPasswordEmail(user.email, passwordToSend, user.phone);
+      
+      res.json({ 
+        success: true,
+        message: 'Account details have been sent to your email'
+      });
+    } catch (emailError) {
+      console.error('Error sending account details email:', emailError);
+      return errorResponse(res, 500, 'Failed to send account details. Please try again later.');
+    }
 
   } catch (error) {
     console.error('Forgot password error:', error);
